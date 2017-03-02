@@ -1,0 +1,68 @@
+# K-Means clustering using random numbers
+obs=np.random.random(90).reshape(30,3)
+obs
+
+c1=np.random.choice(range(len(obs)))
+c2=np.random.choice(range(len(obs)))
+clust_cen=np.vstack([obs[c1],obs[c2]])
+clust_cen
+
+from scipy.cluster.vq import vq
+vq(obs,clust_cen)
+
+from scipy.cluster.vq import kmeans
+kmeans(obs,clust_cen)
+
+from scipy.cluster.vq import kmeans
+kmeans(obs,2)
+
+# Importing and Exploring the dataset
+import pandas as pd
+df=pd.read_csv('E:/Personal/Learning/Predictive Modeling Book/Book Datasets/Clustering/wine.csv',sep=';')
+df.head()
+
+import matplotlib.pyplot as plt
+% matplotlib inline
+plt.hist(df['quality'])
+
+df.groupby('quality').mean()
+
+df_norm = (df - df.min()) / (df.max() - df.min())
+df_norm.head() 
+
+
+# Hierarchical Clustering using Scikit Learn
+from sklearn.cluster import AgglomerativeClustering
+ward = AgglomerativeClustering(n_clusters=6, linkage='ward').fit(df_norm)
+md=pd.Series(ward.labels_)
+
+import matplotlib.pyplot as plt
+% matplotlib inline
+plt.hist(md)
+plt.title('Histogram of Cluster Label’)
+plt.xlabel('Cluster')
+plt.ylabel('Frequency')
+
+ward.children_
+
+# K-Means CLustering using Python
+from sklearn.cluster import KMeans
+from sklearn import datasets
+model=KMeans(n_clusters=6)
+model.fit(df_norm)
+
+md=pd.Series(model.labels_)
+df_norm['clust']=md
+df_norm.head()
+
+model.cluster_centers_
+model.inertia_
+
+import matplotlib.pyplot as plt
+% matplotlib inline
+plt.hist(df_norm['clust'])
+plt.title('Histogram of Clusters')
+plt.xlabel('Cluster')
+plt.ylabel('Frequency')
+
+

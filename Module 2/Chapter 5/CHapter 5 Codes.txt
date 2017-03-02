@@ -1,0 +1,294 @@
+# Step 1: defining the likelihood function
+def likelihood(y,pi):
+    import numpy as np
+    ll=1
+    ll_in=range(1,len(y)+1)
+    for i in range(len(y)):
+        ll_in[i]=np.where(y[i]==1,pi[i],(1-pi[i]))
+        ll=ll*ll_in[i]
+    return ll
+
+# Step 2: calculating probability for each observation
+def logitprob(X,beta):
+    import numpy as np
+    rows=np.shape(X)[0]
+    cols=np.shape(X)[1]
+    pi=range(1,rows+1)
+    expon=range(1,rows+1)
+    for i in range(rows):
+        expon[i]=0
+        for j in range(cols):
+            ex=X[i][j]*beta[j]
+            expon[i]=ex+expon[i]
+        with np.errstate(divide='ignore', invalid='ignore'):
+            pi[i]=np.exp(expon[i])/(1+np.exp(expon[i]))
+    return pi
+
+# Step 3: Calculate the W diagonal matrix
+def findW(pi):
+    import numpy as np
+    W=np.zeros(len(pi)*len(pi)).reshape(len(pi),len(pi))
+    for i in range(len(pi)):
+        print i
+        W[i,i]=pi[i]*(1-pi[i])
+        W[i,i].astype(float)
+    return W
+
+# Step 4: defining the logistic function
+def logistic(X,Y,limit):
+    import numpy as np
+    from numpy import linalg
+    nrow=np.shape(X)[0]
+    bias=np.ones(nrow).reshape(nrow,1)
+    X_new=np.append(X,bias,axis=1)
+    ncol=np.shape(X_new)[1]
+    beta=np.zeros(ncol).reshape(ncol,1)
+    root_diff=np.array(range(1,ncol+1)).reshape(ncol,1)
+    iter_i=10000
+    while(iter_i>limit):
+        print iter_i, limit
+        pi=logitprob(X_new,beta)
+        print pi
+        W=findW(pi)
+        print W
+        print X_new
+        print (Y-np.transpose(pi))
+        print np.array((linalg.inv(np.matrix(np.transpose(X_new))*np.matrix(W)*np.matrix(X_new)))*(np.transpose(np.matrix(X_new))*np.matrix(Y-np.transpose(pi)).transpose()))
+        print beta
+        print type(np.matrix(np.transpose(Y-np.transpose(pi)))) 
+        print np.matrix(Y-np.transpose(pi)).transpose().shape
+        print np.matrix(np.transpose(X_new)).shape
+        root_diff=np.array((linalg.inv(np.matrix(np.transpose(X_new))*np.matrix(W)*np.matrix(X_new)))*(np.transpose(np.matrix(X_new))*np.matrix(Y-np.transpose(pi)).transpose()))
+        beta=beta+root_diff
+        iter_i=np.sum(root_diff*root_diff)
+        ll=likelihood(Y,pi)
+        print beta
+        print beta.shape
+    return beta
+
+# Testing the model 
+import numpy as np
+X=np.array(range(10)).reshape(10,1)
+Y=[0,0,0,0,1,0,1,0,1,1]
+bias=np.ones(10).reshape(10,1)
+X_new=np.append(X,bias,axis=1)
+
+
+# Running logistic Regression using our function
+a=logistic(X,Y,0.000000001)
+ll=likelihood(Y,logitprob(X,a))
+
+Coefficient of X = 0.66 , Intercept = -3.69
+
+# From stasmodel.api
+import statsmodels.api as sm
+logit_model=sm.Logit(Y,X_new)
+result=logit_model.fit()
+print result.summary()
+
+Coefficient of X = 0.66 , Intercept = -3.69
+
+
+
+# Creating the Contingency Table
+import pandas as pd
+df=pd.read_csv('E:/Personal/Learning/Predictive Modeling Book/Book Datasets/Logistic Regression/Gender Purchase.csv')
+df.head() 
+
+contingency_table=pd.crosstab(df['Gender'],df['Purchase'])
+contingency_table
+
+contingency_table.astype('float').div(contingency_table.sum(axis=1),axis=0)
+
+
+# Importing the dataset
+import pandas as pd
+bank=pd.read_csv('E:/Personal/Learning/Predictive Modeling Book/Book Datasets/Logistic Regression/bank.csv',sep=';')
+bank.head()
+
+
+# Processing the data
+bank['y']=(bank['y']=='yes').astype(int)
+
+import numpy as np
+bank['education']=np.where(bank['education'] =='basic.9y', 'Basic', bank['education'])
+bank['education']=np.where(bank['education'] =='basic.6y', 'Basic', bank['education'])
+bank['education']=np.where(bank['education'] =='basic.4y', 'Basic', bank['education'])
+bank['education']=np.where(bank['education'] =='university.degree', 'University Degree', bank['education'])
+bank['education']=np.where(bank['education'] =='professional.course', 'Professional Course', bank['education'])
+bank['education']=np.where(bank['education'] =='high.school', 'High School', bank['education'])
+bank['education']=np.where(bank['education'] =='illiterate', 'Illiterate', bank['education'])
+bank['education']=np.where(bank['education'] =='unknown', 'Unknown', bank['education'])
+
+# Data Exploration
+bank['y'].value_counts()
+bank.groupby('y').mean()
+bank.groupby('education').mean()
+
+# Data Visualisation
+
+%matplotlib inline
+pd.crosstab(bank.education,bank.y).plot(kind='bar')
+plt.title('Purchase Frequency for Education Level')
+plt.xlabel('Education')
+plt.ylabel('Frequency of Purchase') 
+
+table=pd.crosstab(bank.marital,bank.y)
+table.div(table.sum(1).astype(float), axis=0).plot(kind='bar', stacked=True)
+plt.title('Stacked Bar Chart of Marital Status vs Purchase')
+plt.xlabel('Marital Status')
+plt.ylabel('Proportion of Customers')
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+pd.crosstab(bank.day_of_week,bank.y).plot(kind='bar')
+plt.title('Purchase Frequency for Day of Week')
+plt.xlabel('Day of Week')
+plt.ylabel('Frequency of Purchase')
+
+import matplotlib.pyplot as plt
+bank.age.hist()
+plt.title('Histogram of Age')
+plt.xlabel('Age')
+plt.ylabel('Frequency')                    
+
+# Creating dummy variables for categorical variables
+cat_vars=['job','marital','education','default','housing','loan','contact','month','day_of_week','poutcome']
+for var in cat_vars:
+    cat_list='var'+'_'+var
+    cat_list = pd.get_dummies(bank[var], prefix=var)
+    bank1=bank.join(cat_list)
+    bank=bank1
+
+cat_vars=['job','marital','education','default','housing','loan','contact','month','day_of_week','poutcome']
+bank_vars=bank.columns.values.tolist()
+to_keep=[i for i in bank_vars if i not in cat_vars] 
+
+bank_final=bank[to_keep]
+bank_final.columns.values
+
+bank_final_vars=bank_final.columns.values.tolist()
+Y=['y']
+X=[i for i in bank_final_vars if i not in Y ]
+
+
+# Feature Selection
+
+from sklearn import datasets
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+
+rfe = RFE(model, 12)
+rfe = rfe.fit(bank_final[X],bank_final[Y] )
+
+print(rfe.support_)
+print(rfe.ranking_)
+
+
+cols=['previous', 'euribor3m', 'job_entrepreneur', 'job_self-employed', 'poutcome_success', 'poutcome_failure', 'month_oct', 'month_may',
+    'month_mar', 'month_jun', 'month_jul', 'month_dec'] 
+X=bank_final[cols]
+Y=bank_final['y']
+
+# Implementing the model
+
+import statsmodels.api as sm
+logit_model=sm.Logit(Y,X)
+result=logit_model.fit()
+print result.summary()
+
+from sklearn import linear_model
+clf = linear_model.LogisticRegression()
+clf.fit(X, Y)
+clf.score(X,Y)
+
+import numpy as np
+pd.DataFrame(zip(X.columns, np.transpose(clf.coef_))) 
+
+# Model evaluation and validation
+
+from sklearn.cross_validation import train_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=0)
+
+from sklearn import linear_model
+from sklearn import metrics
+clf1 = linear_model.LogisticRegression()
+clf1.fit(X_train, Y_train)
+
+probs = clf1.predict_proba(X_test)
+predicted = clf1.predict(X_test)
+
+import pandas as pd
+import numpy as np
+prob=probs[:,1]
+prob_df=pd.DataFrame(prob)
+prob_df['predict']=np.where(prob_df[0]>=0.10,1,0)
+prob_df.head() 
+
+print metrics.accuracy_score(Y_test, predicted)
+
+# Cross Validation
+
+from sklearn.cross_validation import cross_val_score
+scores = cross_val_score(linear_model.LogisticRegression(), X, Y, scoring='accuracy', cv=8)
+print scores
+print scores.mean()
+
+
+# ROC Curve
+
+from sklearn.cross_validation import train_test_split
+from sklearn import linear_model
+from sklearn import metrics
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=0)
+clf1 = linear_model.LogisticRegression()
+clf1.fit(X_train, Y_train)
+probs = clf1.predict_proba(X_test)
+
+prob=probs[:,1]
+prob_df=pd.DataFrame(prob)
+prob_df['predict']=np.where(prob_df[0]>=0.05,1,0)
+prob_df['actual']=Y_test
+prob_df.head()
+
+confusion_matrix=pd.crosstab(prob_df['actual'],prob_df['predict'])
+confusion_matrix
+
+import matplotlib.pyplot as plt
+%matplotlib inline
+Sensitivity=[1,0.95,0.87,0.62,0.67,0.59,0.5,0.41,0]
+FPR=[1,0.76,0.62,0.23,0.27,0.17,0.12,0.07,0]
+plt.plot(FPR,Sensitivity,marker='o',linestyle='--',color='r')
+x=[i*0.01 for i in range(100)]
+y=[i*0.01 for i in range(100)]
+plt.plot(x,y)
+plt.xlabel('(1-Specificity)')
+plt.ylabel('Sensitivity')
+plt.title('ROC Curve')
+
+from sklearn import metrics
+from ggplot import *
+prob = clf1.predict_proba(X_test)[:,1]
+fpr, sensitivity, _ = metrics.roc_curve(Y_test, prob)
+df = pd.DataFrame(dict(fpr=fpr, sensitivity=sensitivity))
+ggplot(df, aes(x='fpr', y='sensitivity')) +\
+    geom_line() +\
+    geom_abline(linetype='dashed')
+auc = metrics.auc(fpr,sensitivity)
+
+ggplot(df, aes(x='fpr', ymin=0, ymax='sensitivity')) +\
+    geom_area(alpha=0.2) +\
+    geom_line(aes(y='sensitivity')) +\
+    ggtitle("ROC Curve w/ AUC=%s" % str(auc))
+
+
+
+
+
+
+
+
+
+

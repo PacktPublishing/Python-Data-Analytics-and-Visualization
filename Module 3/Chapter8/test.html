@@ -1,0 +1,45 @@
+<html>
+<body>
+<svg height="400" width="1200" >
+  <g id="setttings">
+    <filter id="dropshadow" height="160%">
+     <feGaussianBlur in="SourceAlpha" stdDeviation="5"></feGaussianBlur>
+       <feOffset dx="0" dy="3" result="offsetblur"></feOffset>
+       <feMerge>
+          <feMergeNode></feMergeNode>
+          <feMergeNode in="SourceGraphic"></feMergeNode>
+       </feMerg>
+    </filter>
+  <circle cx="140" cy="146" r="100"
+    style="stroke: #080;stroke-width:2;fill:white;filter:url(#dropshadow)"  />
+  <circle clip-path="url(#dataseg-1)" fill="#080" cx="140" cy="146" r="100"
+    style="stroke:rgb(0,0,0);stroke-width:0;z-index:10000;"  />
+<clipPath id="dataseg-1"> <rect height="200" width="200" y="127" x="40"></rect></clipPath>
+  <circle cx="370" cy="146" r="100"
+    style="stroke: #e23;stroke-width:2;fill:white;filter:url(#dropshadow)"  />
+  <circle clip-path="url(#dataseg-2)" fill="#e23" cx="370" cy="146" r="100"
+    style="stroke:rgb(0,0,0);stroke-width:0;z-index:10000;"  />
+<clipPath id="dataseg-2"> <rect height="200" width="200" y="150" x="270"></rect></clipPath>
+  <circle cx="600" cy="146" r="100"
+    style="stroke: #27b;stroke-width:2;fill:white;filter:url(#dropshadow)"  />
+  <circle clip-path="url(#dataseg-3)" fill="#27b" cx="600" cy="146" r="100"
+    style="stroke:rgb(0,0,0);stroke-width:0;z-index:10000;"  />
+<clipPath id="dataseg-3"> <rect height="200" width="200" y="106" x="500"></rect></clipPath>
+  <circle cx="830" cy="146" r="100"
+    style="stroke: #f80;stroke-width:2;fill:white;filter:url(#dropshadow)"  />
+  <circle clip-path="url(#dataseg-4)" fill="#f80" cx="830" cy="146" r="100"
+    style="stroke:rgb(0,0,0);stroke-width:0;z-index:10000;"  />
+<clipPath id="dataseg-4"> <rect height="200" width="200" y="178" x="730"></rect></clipPath>
+ <text y="176" x="120" style="fill:white;font-weight:bold;">English</text>
+ <text y="196" x="120" style="fill:#e2e2e2">Speaking</text>
+ <text y="202" x="340" style="fill:black;font-weight:bold;">German</text>
+ <text y="182" x="576" style="fill:white;font-weight:bold;">Spanish</text>
+ <text y="198" x="804" style="fill:black;font-weight:bold;">Japanese</text>
+ <text y="88" x="120" style="font-size:18px;font-weight:bold;fill:black">54%</text>
+ <text y="88" x="350" style="font-size:18px;font-weight:bold;fill:black">42%</text>
+ <text y="88" x="585" style="font-size:18px;font-weight:bold;fill:black">65%</text>
+ <text y="88" x="815" style="font-size:18px;font-weight:bold;fill:black">27%</text>
+ </g>
+</svg>
+</body>
+</html>

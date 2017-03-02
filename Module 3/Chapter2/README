@@ -1,0 +1,7 @@
+On Page 5 the python code has an error 
+(A space before Cumulative for sierradata and liberiadata and also a space at the end)
+Attached python code here (which is the correct version)
+
+On Page 12 (the second example of Quarterback records by age)
+The program has few errors, I checked and corrected them.  The correct code is in qb_records_byage.py
+

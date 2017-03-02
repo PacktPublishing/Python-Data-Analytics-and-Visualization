@@ -1,0 +1,121 @@
+# Importing the iris dataset
+
+import pandas as pd
+data=pd.read_csv('E:/Personal/Learning/Predictive Modeling Book/My Work/Chapter 7/iris.csv')
+data.head() 
+
+# Splitting the predictor and target variables
+
+colnames=data.columns.values.tolist()
+predictors=colnames[:4]
+target=colnames[4]
+
+# Splitting the dataset into train and test variables
+data['is_train'] = np.random.uniform(0, 1, len(df)) <= .75
+train, test = data[data['is_train']==True], data[data['is_train']==False]
+
+# Creating and fitting a Decision Tree
+
+dt = DecisionTreeClassifier(criterion='entropy',min_samples_split=20, random_state=99)
+dt.fit(train[predictors], train[target])  
+
+# Predicting the values using the decision tree
+
+preds=dt.predict(test[predictors])
+pd.crosstab(test['Species'],preds,rownames=['Actual'],colnames=['Predictions'])
+
+# Visualising the Decision Tree
+
+from sklearn.tree import export_graphviz
+with open('E:/Personal/Learning/Predictive Modeling Book/My Work/Chapter 7/dtree2.dot', 'w') as dotfile:
+    export_graphviz(dt, out_file = dotfile, feature_names = predictors)
+dotfile.close()
+
+from os import system
+system("dot -Tpng /E:/Personal/Learning/Predictive Modeling Book/My Work/Chapter 7/dtree2.dot -o /E:/Personal/Learning/Predictive Modeling Book/My Work/Chapter 7/dtree2.png")
+
+
+# Cross Validating and Pruning the Decision Tree
+
+X=data[predictors]
+Y=data[target]
+dt1.fit(X,Y)
+dt1 = DecisionTreeClassifier(criterion='entropy',max_depth=5, min_samples_split=20, random_state=99)
+
+from sklearn.cross_validation import KFold
+crossvalidation = KFold(n=X.shape[0], n_folds=10, shuffle=True, random_state=1)
+from sklearn.cross_validation import cross_val_score
+score = np.mean(cross_val_score(dt1, X, Y, scoring='accuracy', cv=crossvalidation, n_jobs=1))
+score
+
+# Feature importance of the tree
+
+dt1.feature_importances_
+
+# Importing the Boston dataset
+
+import pandas as pd
+data=pd.read_csv('E:/Personal/Learning/Predictive Modeling Book/My Work/Chapter 7/Boston.csv')
+data.head()
+
+# Preparation for fitting a regression tree
+
+colnames=data.columns.values.tolist()
+predictors=colnames[:13]
+target=colnames[13]
+X=data[predictors]
+Y=data[target]
+
+# Creating and fitting a regression tree
+
+from sklearn.tree import DecisionTreeRegressor
+regression_tree = DecisionTreeRegressor(min_samples_split=30,min_samples_leaf=10,random_state=0)
+regression_tree.fit(X,Y)
+
+# Comparing actual and the predicted values from the Regression Tree
+
+reg_tree_pred=regression_tree.predict(data[predictors])
+data['pred']=reg_tree_pred
+cols=['pred','medv']
+data[cols]
+
+#Cross Validating the Regression Tree
+
+from sklearn.cross_validation import KFold
+from sklearn.cross_validation import cross_val_score
+import numpy as np
+crossvalidation = KFold(n=X.shape[0], n_folds=10,shuffle=True, random_state=1)
+score = np.mean(cross_val_score(regression_tree, X, Y,scoring='mean_squared_error', cv=crossvalidation,n_jobs=1))
+score
+ 
+# Calculating the feature importance
+
+regression_tree.feature_importances_
+
+# Creating and fitting a Random Forest
+
+from sklearn.ensemble import RandomForestRegressor
+rf = RandomForestRegressor(n_jobs=2,oob_score=True,n_estimators=10)
+rf.fit(X,Y)
+
+# Out of Bag prediction
+
+rf.oob_prediction_
+
+# Comparing actual values with Random Forest predictions
+
+data['rf_pred']=rf.oob_prediction_
+cols=['rf_pred','medv']
+data[cols].head()
+
+# Calculating the squared mean error
+
+data['rf_pred']=rf.oob_prediction_
+data['err']=(data['rf_pred']-data['medv'])**2
+sum(data['err'])/506
+
+# Calculating the oob score
+
+rf.oob_score_
+
+
